@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Kalendra.Inventory.Tests.Editor.Domain
 {
-    public class GeneralistInventory : IInventory
+    public class GeneralistInventory : IInventory, ICategorizedInventory
     {
         List<ItemPile> itemPiles = new List<ItemPile>();
 
@@ -23,7 +23,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         }
         #endregion
 
-        public IReadOnlyCollection<ItemPile> Items => itemPiles;
+        public IEnumerable<ItemPile> Items => itemPiles;
 
         #region IInventory implementation
         public bool HasItem(IInventoryItem item, int minCount = 1) => GetItemCount(item) >= minCount;
@@ -52,6 +52,14 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
             
             RemoveItemFromPilesUntilCount(item, count);
         }
+        #endregion
+        
+        #region ICategorizedInventory implementation
+        public bool HasCategory(IInventoryItemCategory category) =>
+            itemPiles.Any(pile => pile.item.Category == category);
+        
+        public IEnumerable<ItemPile> GetItems(IInventoryItemCategory category) =>
+            itemPiles.Where(pile => pile.item.Category == category);
         #endregion
 
         #region Support methods

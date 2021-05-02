@@ -11,7 +11,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         [Test]
         public void NewInventory_IsEmpty_ByDefault()
         {
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             var result = sut.Items;
 
@@ -22,7 +22,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void NewInventory_ReceivingItems_ThenIsNotEmpty()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory(new[] {mockItem});
+            IInventory sut = new GeneralistInventory(new[] {mockItem});
 
             var result = sut.Items;
 
@@ -33,7 +33,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void NewInventory_ReceivingItem_ThenHasThatItems()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory(new[] {mockItem});
+            IInventory sut = new GeneralistInventory(new[] {mockItem});
 
             var result = sut.HasItem(mockItem);
 
@@ -44,7 +44,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void NewInventory_ReceivingPiles_ThenIsNotEmpty()
         {
             var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
-            var sut = new GeneralistInventory(new[] {mockItemPile});
+            IInventory sut = new GeneralistInventory(new[] {mockItemPile});
 
             var result = sut.Items;
 
@@ -55,7 +55,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void NewInventory_ReceivingPiles_ThenHasSameItems()
         {
             var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
-            var sut = new GeneralistInventory(new[]{mockItemPile});
+            IInventory sut = new GeneralistInventory(new[]{mockItemPile});
 
             var result = sut.Items;
 
@@ -66,7 +66,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void NewInventory_ReceivingPile_HasPileCount()
         {
             var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
-            var sut = new GeneralistInventory(new[]{mockItemPile});
+            IInventory sut = new GeneralistInventory(new[]{mockItemPile});
 
             var result = sut.HasItem(mockItemPile.item, 10);
 
@@ -79,7 +79,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void AddItem_OnEmptyInventory_ThenIsNotEmptyAnymore()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             sut.AddItem(mockItem);
 
@@ -90,7 +90,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void AddItem_OnEmptyInventory_ThenHasThatItem()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             sut.AddItem(mockItem);
 
@@ -101,7 +101,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void AddItemNCount_OnEmptyInventory__ThenGetItemCount_IsN()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             sut.AddItem(mockItem, 20);
 
@@ -112,7 +112,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void AddItem_NTimes_ThenGetItemCount_IsNTotalCount()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             sut.AddItem(mockItem);
             sut.AddItem(mockItem, 19);
@@ -124,7 +124,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void AddItem_WhenCountIsZero_OnEmptyInventory_ThenIsStillEmpty()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             sut.AddItem(mockItem, 0);
 
@@ -135,7 +135,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void AddItem_WithNegativeCount_ThrowsException()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             Action act = () => sut.AddItem(mockItem, -1);
 
@@ -147,7 +147,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         [Test]
         public void HasItem_OnEmptyBoard_IsFalse()
         {
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             var result = sut.HasItem(Substitute.For<IInventoryItem>());
 
@@ -158,7 +158,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void HasItem_WhenItemWasAdded_IsTrue()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory(new[] {mockItem});
+            IInventory sut = new GeneralistInventory(new[] {mockItem});
 
             var result = sut.HasItem(mockItem);
 
@@ -169,7 +169,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void HasItem_WithMinCount_WhenItemWasAdded_WithLess_IsFalse()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory(new[] {mockItem});
+            IInventory sut = new GeneralistInventory(new[] {mockItem});
 
             var result = sut.HasItem(mockItem, 2);
 
@@ -180,7 +180,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void HasItem_WithMinCount_WhenItemWasAdded_WithGreater_IsTrue()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
             sut.AddItem(mockItem, 11);
 
             var result = sut.HasItem(mockItem, 10);
@@ -192,7 +192,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void HasItem_WithMinCount_WhenItemWasAdded_WithEquals_IsTrue()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
             sut.AddItem(mockItem, 10);
 
             var result = sut.HasItem(mockItem, 10);
@@ -206,7 +206,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void RemoveItem_WithNegativeCount_ThrowsException()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
 
             Action act = () => sut.RemoveItem(mockItem, -1);
 
@@ -217,7 +217,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void RemoveItem_WhenCountIsZero_DoesNothing()
         {
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory(new[] {mockItem});
+            IInventory sut = new GeneralistInventory(new[] {mockItem});
 
             sut.RemoveItem(mockItem, 0);
 
@@ -228,7 +228,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void RemoveItem_WithTotalCount_RemovesTheItem()
         {
             var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
-            var sut = new GeneralistInventory(new[] {mockItemPile});
+            IInventory sut = new GeneralistInventory(new[] {mockItemPile});
 
             sut.RemoveItem(mockItemPile.item, 10);
 
@@ -239,7 +239,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public void RemoveItem_WithCountGreaterThanTotalCount_ThrowsException()
         {
             var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
-            var sut = new GeneralistInventory(new[] {mockItemPile});
+            IInventory sut = new GeneralistInventory(new[] {mockItemPile});
 
             Action act = () => sut.RemoveItem(mockItemPile.item, 11);
 
@@ -251,7 +251,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         {
             //Arrange
             var mockItem = Substitute.For<IInventoryItem>();
-            var sut = new GeneralistInventory();
+            IInventory sut = new GeneralistInventory();
             
             sut.AddItem(mockItem, 2);
             sut.AddItem(mockItem, 3);

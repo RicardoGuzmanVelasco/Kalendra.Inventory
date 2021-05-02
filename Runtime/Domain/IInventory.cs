@@ -4,7 +4,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
 {
     public interface IInventory
     {
-        IReadOnlyCollection<ItemPile> Items { get; }
+        IEnumerable<ItemPile> Items { get; }
         
         bool HasItem(IInventoryItem item, int minCount = 1);
         void AddItem(IInventoryItem item, int count = 1);
