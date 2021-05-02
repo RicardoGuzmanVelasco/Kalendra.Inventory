@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Kalendra.Inventory.Tests.Editor.Domain
 {
-    public class GeneralistInventory
+    public class GeneralistInventory : IInventory
     {
         List<ItemPile> itemPiles = new List<ItemPile>();
 
@@ -26,44 +26,53 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public IReadOnlyCollection<ItemPile> Items => itemPiles;
 
         #region IInventory implementation
-        public bool HasItem(IInventoryItem item) => itemPiles.Any(pile => pile.item == item);
+        public bool HasItem(IInventoryItem item, int minCount = 1) => GetItemCount(item) >= minCount;
 
-        public void AddItem(IInventoryItem item) => AddItem(item, 1);
-        public void AddItem(IInventoryItem item, int count)
+        public void AddItem(IInventoryItem item, int count = 1)
         {
-            switch(count)
-            {
-                case < 0:
-                    throw new InvalidOperationException("Unable to add negative items");
-                case 0:
-                    return;
-            }
+            if(count < 0)
+                throw new InvalidOperationException("Unable to add negative items");
+            if(count == 0)
+                return;
 
             if(!HasItem(item))
                 itemPiles.Add(new ItemPile(item, 0));
 
-            var itemPile = itemPiles.First(pile => pile.item == item);
+            var itemPile = GetPiles(item).First();
             itemPile.count += count;
         }
 
-        public int GetItemCount(IInventoryItem item) => itemPiles.Where(i => i.item == item).Select(i => i.count).Sum();
-
-        public void RemoveItem(IInventoryItem item, int count)
+        public void RemoveItem(IInventoryItem item, int count = 1)
         {
             if(count < 0)
                 throw new InvalidOperationException("Unable to remove negative items");
-            
-            var itemPile = itemPiles.First(pile => pile.item == item);
-            itemPile.count -= count;
 
-            CleanEmptyPiles();
+            if(GetItemCount(item) < count)
+                throw new InvalidOperationException($"Trying to remove {count} items but just found {GetItemCount(item)}");
+            
+            RemoveItemFromPilesUntilCount(item, count);
         }
         #endregion
 
         #region Support methods
-        void CleanEmptyPiles()
+        IEnumerable<ItemPile> GetPiles(IInventoryItem item) => itemPiles.Where(pile => pile.item == item);
+        
+        int GetItemCount(IInventoryItem item) => GetPiles(item).Sum(p => p.count);
+        
+        void CleanEmptyPiles() => itemPiles = itemPiles.Where(pile => pile.count > 0).ToList();
+        
+        void RemoveItemFromPilesUntilCount(IInventoryItem item, int count)
         {
-            itemPiles = itemPiles.Where(pile => pile.count > 0).ToList();
+            if(count <= 0)
+                return;
+            
+            var pileToRemoveFrom = GetPiles(item).First();
+            var countToRemove = Math.Min(count, pileToRemoveFrom.count);
+
+            pileToRemoveFrom.count -= countToRemove;
+            CleanEmptyPiles();
+            
+            RemoveItemFromPilesUntilCount(item, count - countToRemove);
         }
         #endregion
     }

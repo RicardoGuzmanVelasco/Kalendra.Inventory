@@ -21,8 +21,8 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         [Test]
         public void NewInventory_ReceivingItems_ThenIsNotEmpty()
         {
-            var items = new[] {Substitute.For<IInventoryItem>()};
-            var sut = new GeneralistInventory(items);
+            var mockItem = Substitute.For<IInventoryItem>();
+            var sut = new GeneralistInventory(new[] {mockItem});
 
             var result = sut.Items;
 
@@ -32,10 +32,10 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         [Test]
         public void NewInventory_ReceivingItem_ThenHasThatItems()
         {
-            var items = new[] {Substitute.For<IInventoryItem>()};
-            var sut = new GeneralistInventory(items);
+            var mockItem = Substitute.For<IInventoryItem>();
+            var sut = new GeneralistInventory(new[] {mockItem});
 
-            var result = sut.HasItem(items[0]);
+            var result = sut.HasItem(mockItem);
 
             result.Should().BeTrue();
         }
@@ -43,8 +43,8 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         [Test]
         public void NewInventory_ReceivingPiles_ThenIsNotEmpty()
         {
-            var piles = new[] {new ItemPile(Substitute.For<IInventoryItem>(), 10)};
-            var sut = new GeneralistInventory(piles);
+            var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
+            var sut = new GeneralistInventory(new[] {mockItemPile});
 
             var result = sut.Items;
 
@@ -52,14 +52,25 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         }
 
         [Test]
-        public void NewInventory_ReceivingPiles_ThenHasSamePile()
+        public void NewInventory_ReceivingPiles_ThenHasSameItems()
         {
-            var piles = new[] {new ItemPile(Substitute.For<IInventoryItem>(), 10)};
-            var sut = new GeneralistInventory(piles);
+            var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
+            var sut = new GeneralistInventory(new[]{mockItemPile});
 
             var result = sut.Items;
 
-            result.Should().Contain(piles[0]);
+            result.Should().Contain(mockItemPile);
+        }
+
+        [Test]
+        public void NewInventory_ReceivingPile_HasPileCount()
+        {
+            var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
+            var sut = new GeneralistInventory(new[]{mockItemPile});
+
+            var result = sut.HasItem(mockItemPile.item, 10);
+
+            result.Should().BeTrue();
         }
         #endregion
 
@@ -94,7 +105,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
 
             sut.AddItem(mockItem, 20);
 
-            sut.GetItemCount(mockItem).Should().Be(20);
+            sut.HasItem(mockItem, 20).Should().BeTrue();
         }
 
         [Test]
@@ -106,7 +117,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
             sut.AddItem(mockItem);
             sut.AddItem(mockItem, 19);
 
-            sut.GetItemCount(mockItem).Should().Be(20);
+            sut.HasItem(mockItem, 20).Should().BeTrue();
         }
 
         [Test]
@@ -131,6 +142,64 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
             act.Should().ThrowExactly<InvalidOperationException>();
         }
         #endregion
+        
+        #region HasItem
+        [Test]
+        public void HasItem_OnEmptyBoard_IsFalse()
+        {
+            var sut = new GeneralistInventory();
+
+            var result = sut.HasItem(Substitute.For<IInventoryItem>());
+
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public void HasItem_WhenItemWasAdded_IsTrue()
+        {
+            var mockItem = Substitute.For<IInventoryItem>();
+            var sut = new GeneralistInventory(new[] {mockItem});
+
+            var result = sut.HasItem(mockItem);
+
+            result.Should().BeTrue();
+        }
+
+        [Test]
+        public void HasItem_WithMinCount_WhenItemWasAdded_WithLess_IsFalse()
+        {
+            var mockItem = Substitute.For<IInventoryItem>();
+            var sut = new GeneralistInventory(new[] {mockItem});
+
+            var result = sut.HasItem(mockItem, 2);
+
+            result.Should().BeFalse();
+        }
+        
+        [Test]
+        public void HasItem_WithMinCount_WhenItemWasAdded_WithGreater_IsTrue()
+        {
+            var mockItem = Substitute.For<IInventoryItem>();
+            var sut = new GeneralistInventory();
+            sut.AddItem(mockItem, 11);
+
+            var result = sut.HasItem(mockItem, 10);
+
+            result.Should().BeTrue();
+        }
+
+        [Test]
+        public void HasItem_WithMinCount_WhenItemWasAdded_WithEquals_IsTrue()
+        {
+            var mockItem = Substitute.For<IInventoryItem>();
+            var sut = new GeneralistInventory();
+            sut.AddItem(mockItem, 10);
+
+            var result = sut.HasItem(mockItem, 10);
+
+            result.Should().BeTrue();
+        }
+        #endregion
 
         #region RemoveItem
         [Test]
@@ -147,23 +216,51 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         [Test]
         public void RemoveItem_WhenCountIsZero_DoesNothing()
         {
-            var mockItems = new[] {Substitute.For<IInventoryItem>()};
-            var sut = new GeneralistInventory(mockItems);
+            var mockItem = Substitute.For<IInventoryItem>();
+            var sut = new GeneralistInventory(new[] {mockItem});
 
-            sut.RemoveItem(mockItems[0], 0);
+            sut.RemoveItem(mockItem, 0);
 
-            sut.HasItem(mockItems[0]).Should().BeTrue();
+            sut.HasItem(mockItem).Should().BeTrue();
         }
-        
+
         [Test]
         public void RemoveItem_WithTotalCount_RemovesTheItem()
         {
-            var mockItems = new[] {new ItemPile(Substitute.For<IInventoryItem>(), 10)};
-            var sut = new GeneralistInventory(mockItems);
+            var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
+            var sut = new GeneralistInventory(new[] {mockItemPile});
 
-            sut.RemoveItem(mockItems[0].item, 10);
+            sut.RemoveItem(mockItemPile.item, 10);
 
-            sut.HasItem(mockItems[0].item).Should().BeFalse();
+            sut.HasItem(mockItemPile.item).Should().BeFalse();
+        }
+
+        [Test]
+        public void RemoveItem_WithCountGreaterThanTotalCount_ThrowsException()
+        {
+            var mockItemPile = new ItemPile(Substitute.For<IInventoryItem>(), 10);
+            var sut = new GeneralistInventory(new[] {mockItemPile});
+
+            Action act = () => sut.RemoveItem(mockItemPile.item, 11);
+
+            act.Should().ThrowExactly<InvalidOperationException>();
+        }
+
+        [Test]
+        public void RemoveItem_WithCountGreater_WhenItemIsSplitInSomePiles_RemovesUntilCount()
+        {
+            //Arrange
+            var mockItem = Substitute.For<IInventoryItem>();
+            var sut = new GeneralistInventory();
+            
+            sut.AddItem(mockItem, 2);
+            sut.AddItem(mockItem, 3);
+
+            //Act
+            sut.RemoveItem(mockItem, 3);
+
+            //Assert
+            sut.HasItem(mockItem, 3).Should().BeFalse();
         }
         #endregion
     }
