@@ -6,5 +6,6 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
     {
         bool HasCategory(IInventoryItemCategory category);
         IEnumerable<ItemPile> GetItems(IInventoryItemCategory category);
+        IEnumerable<IInventoryItemCategory> Categories { get; }
     }
 }

@@ -8,7 +8,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
     {
         #region GetItems
         [Test]
-        public void GetItems_OnEmptyBoard_ReturnsEmpty()
+        public void GetItems_OnEmptyInventory_ReturnsEmpty()
         {
             var sut = new GeneralistInventory();
 
@@ -59,7 +59,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         
         #region HasCategory
         [Test]
-        public void HasCategory_OnEmptyBoard_IsFalse()
+        public void HasCategory_OnEmptyInventory_IsFalse()
         {
             var sut = new GeneralistInventory();
 
@@ -118,6 +118,77 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
 
             //Assert
             result.Should().BeTrue();
+        }
+        #endregion
+        
+        #region Categories
+        [Test]
+        public void Categories_OnEmptyInventory_ReturnsEmpty()
+        {
+            var sut = new GeneralistInventory();
+
+            var result = sut.Categories;
+
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void Categories_OnInventoryWithOneItem_ReturnsThatItemCategory()
+        {
+            //Arrange
+            var mockCategory = Substitute.For<IInventoryItemCategory>();
+            
+            var mockItem = Substitute.For<IInventoryItem>();
+            mockItem.Category.Returns(mockCategory);
+            
+            var sut = new GeneralistInventory(new[] {mockItem});
+            
+            //Act
+            var result = sut.Categories;
+
+            //Assert
+            result.Should().HaveCount(1);
+            result.Should().Contain(mockCategory);
+        }
+        
+        [Test]
+        public void Categories_OnInventoryWithSomeItemsOfSameCategory_DoesNotReturnRepeatedCategory()
+        {
+            //Arrange
+            var mockCategory = Substitute.For<IInventoryItemCategory>();
+            
+            var mockItem1 = Substitute.For<IInventoryItem>();
+            mockItem1.Category.Returns(mockCategory);
+            
+            var mockItem2 = Substitute.For<IInventoryItem>();
+            mockItem2.Category.Returns(mockCategory);
+            
+            var sut = new GeneralistInventory(new[] {mockItem1, mockItem2});
+            
+            //Act
+            var result = sut.Categories;
+
+            //Assert
+            result.Should().OnlyHaveUniqueItems();
+        }
+
+        [Test]
+        public void Categories_OnInventoryWithSomeCategories_ReturnsAllCategories()
+        {
+            //Arrange
+            var mockItem1 = Substitute.For<IInventoryItem>();
+            mockItem1.Category.Returns(Substitute.For<IInventoryItemCategory>());
+            
+            var mockItem2 = Substitute.For<IInventoryItem>();
+            mockItem2.Category.Returns(Substitute.For<IInventoryItemCategory>());
+            
+            var sut = new GeneralistInventory(new[] {mockItem1, mockItem2});
+            
+            //Act
+            var result = sut.Categories;
+
+            //Assert
+            result.Should().HaveCount(2);
         }
         #endregion
     }

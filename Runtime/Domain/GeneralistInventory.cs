@@ -55,6 +55,9 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         #endregion
         
         #region ICategorizedInventory implementation
+        public IEnumerable<IInventoryItemCategory> Categories =>
+            itemPiles.Select(pile => pile.item.Category).Distinct();
+        
         public bool HasCategory(IInventoryItemCategory category) =>
             itemPiles.Any(pile => pile.item.Category == category);
         

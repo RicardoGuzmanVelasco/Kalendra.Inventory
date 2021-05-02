@@ -145,7 +145,7 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         
         #region HasItem
         [Test]
-        public void HasItem_OnEmptyBoard_IsFalse()
+        public void HasItem_OnEmptyInventory_IsFalse()
         {
             IInventory sut = new GeneralistInventory();
 
