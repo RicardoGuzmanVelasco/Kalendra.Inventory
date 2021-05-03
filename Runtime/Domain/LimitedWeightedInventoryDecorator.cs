@@ -23,20 +23,9 @@ namespace Kalendra.Inventory.Runtime.Domain
         #region IInventory implementation (delegated)
         public IEnumerable<ItemPile> Items => decorated.Items;
 
-        public bool HasItem(IInventoryItem item, int minCount = 1)
-        {
-            return decorated.HasItem(item, minCount);
-        }
-
-        public void AddItem(IInventoryItem item, int count = 1)
-        {
-            AddItemIfDecoratedCanBear(item, count);
-        }
-
-        public void RemoveItem(IInventoryItem item, int count = 1)
-        {
-            decorated.RemoveItem(item, count);
-        }
+        public bool HasItem(IInventoryItem item, int minCount = 1) => decorated.HasItem(item, minCount);
+        public void AddItem(IInventoryItem item, int count = 1) => AddItemIfDecoratedCanBear(item, count);
+        public void RemoveItem(IInventoryItem item, int count = 1) => decorated.RemoveItem(item, count);
         #endregion
 
         #region IWeightedInventory implementation (delegated)
