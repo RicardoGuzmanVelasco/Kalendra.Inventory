@@ -43,5 +43,22 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
             //Assert
             mockListener.DidNotReceive().Call();
         }
+        
+        [Test]
+        public void AddItem_WhenInventoryCantBear_ConsidersCount()
+        {
+            //Arrange
+            var mockItem = Substitute.For<IInventoryItem>();
+            mockItem.Weight.Returns(1);
+            
+            var docDecorated = new GeneralistInventory(1);
+            var sut = new LimitedWeightedInventoryDecorator(docDecorated);
+            
+            //Act
+            sut.AddItem(mockItem, 2);
+            
+            //Assert
+            sut.Items.Should().BeEmpty();
+        }
     }
 }

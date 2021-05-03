@@ -16,7 +16,7 @@ namespace Kalendra.Inventory.Runtime.Domain
         
         void AddItemIfDecoratedCanBear(IInventoryItem item, int count)
         {
-            if(CanBearItem(item))
+            if(CanBearItem(item, count))
                 decorated.AddItem(item, count);
         }
         
