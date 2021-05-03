@@ -1,4 +1,4 @@
-namespace Kalendra.Inventory.Tests.Editor.Domain
+namespace Kalendra.Inventory.Runtime.Domain
 {
     public class ItemPile
     {

@@ -5,6 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "BoundfoxStudios.FluentAssertions",
+        "Kalendra.Commons.Architecture",
+        "Kalendra.Commons.Tests.Builders",
         "Kalendra.Inventory.Domain"
     ],
     "includePlatforms": [

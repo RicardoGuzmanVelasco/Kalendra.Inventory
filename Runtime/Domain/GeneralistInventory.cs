@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Kalendra.Inventory.Tests.Editor.Domain
+namespace Kalendra.Inventory.Runtime.Domain
 {
-    public class GeneralistInventory : IInventory, ICategorizedInventory
+    public class GeneralistInventory : IInventory, ICategorizedInventory, IWeightedInventory
     {
         List<ItemPile> itemPiles = new List<ItemPile>();
 
@@ -21,11 +21,16 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
             foreach(var item in items)
                 AddItem(item);
         }
+        
+        public GeneralistInventory(int maxWeight)
+        {
+            IncreaseMaxWeight(maxWeight);
+        }
         #endregion
 
-        public IEnumerable<ItemPile> Items => itemPiles;
-
         #region IInventory implementation
+        public IEnumerable<ItemPile> Items => itemPiles;
+        
         public bool HasItem(IInventoryItem item, int minCount = 1) => GetItemCount(item) >= minCount;
 
         public void AddItem(IInventoryItem item, int count = 1)
@@ -35,13 +40,9 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
             if(count == 0)
                 return;
 
-            if(!HasItem(item))
-                itemPiles.Add(new ItemPile(item, 0));
-
-            var itemPile = GetPiles(item).First();
-            itemPile.count += count;
+            AddItemToPiles(item, count);
         }
-
+        
         public void RemoveItem(IInventoryItem item, int count = 1)
         {
             if(count < 0)
@@ -64,6 +65,21 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         public IEnumerable<ItemPile> GetItems(IInventoryItemCategory category) =>
             itemPiles.Where(pile => pile.item.Category == category);
         #endregion
+        
+        #region IWeightedInventory implementation
+        public int MaxWeight { get; private set; }
+        public int CurrentWeight => itemPiles.Sum(p => p.item.Weight * p.count);
+
+        public void IncreaseMaxWeight(int deltaWeight)
+        {
+            AssertPositiveMaxWeight(deltaWeight);
+            MaxWeight += deltaWeight;
+        }
+        
+        public event Action OnOverweight;
+        
+        public bool CanBearItem(IInventoryItem item, int count = 1) => MaxWeight > 0 && MaxWeight - CurrentWeight >= item.Weight * count;
+        #endregion
 
         #region Support methods
         IEnumerable<ItemPile> GetPiles(IInventoryItem item) => itemPiles.Where(pile => pile.item == item);
@@ -72,6 +88,27 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
         
         void CleanEmptyPiles() => itemPiles = itemPiles.Where(pile => pile.count > 0).ToList();
         
+        void AddItemToPiles(IInventoryItem item, int count)
+        {
+            CheckIfNotifyOverweight(item, count);
+
+            if(!HasItem(item))
+                itemPiles.Add(new ItemPile(item, 0));
+
+            var itemPile = GetPiles(item).First();
+            itemPile.count += count;
+        }
+
+        void CheckIfNotifyOverweight(IInventoryItem item, int count)
+        {
+            //Already was overweight.
+            if(CurrentWeight > MaxWeight)
+                return;
+            
+            if(!CanBearItem(item, count))
+                OnOverweight?.Invoke();
+        }
+
         void RemoveItemFromPilesUntilCount(IInventoryItem item, int count)
         {
             if(count <= 0)
@@ -84,6 +121,12 @@ namespace Kalendra.Inventory.Tests.Editor.Domain
             CleanEmptyPiles();
             
             RemoveItemFromPilesUntilCount(item, count - countToRemove);
+        }
+        
+        void AssertPositiveMaxWeight(int weight)
+        {
+            if(weight + CurrentWeight <= 0)
+                throw new ArgumentOutOfRangeException(nameof(weight), "Max weight must be positive");
         }
         #endregion
     }

@@ -1,5 +1,6 @@
 using System;
 using FluentAssertions;
+using Kalendra.Inventory.Runtime.Domain;
 using NSubstitute;
 using NUnit.Framework;
 
