@@ -8,5 +8,6 @@ namespace Kalendra.Inventory.Runtime.Domain
         int CurrentWeight { get; }
         event Action OnOverweight;
         bool CanBearItem(IInventoryItem item, int count = 1);
+        void IncreaseMaxWeight(int deltaWeight);
     }
 }

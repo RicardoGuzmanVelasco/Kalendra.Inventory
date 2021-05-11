@@ -39,6 +39,7 @@ namespace Kalendra.Inventory.Runtime.Domain
         }
 
         public bool CanBearItem(IInventoryItem item, int count = 1) => decorated.CanBearItem(item, count);
+        public void IncreaseMaxWeight(int deltaWeight) => decorated.IncreaseMaxWeight(deltaWeight);
         #endregion
     }
 }
