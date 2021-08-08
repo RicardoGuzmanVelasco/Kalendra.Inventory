@@ -45,7 +45,11 @@ package Domain
         count : int
     }
     ItemPile --> IInventoryItem 
-    
+}
+note left of Domain : A ~ 1 \n (I = 0) \n E = 1
+
+package Domain.Details
+{
     class GeneralistInventory
     {
         -itemPiles : List<itemPile>
@@ -59,7 +63,7 @@ package Domain
     }
     LimitedWeightedInventory --|> IWeightedInventory
     LimitedWeightedInventory o--  IWeightedInventory 
-    
 }
+note top of Domain.Details : A = 0 \n (I = 1) \n E = 0
 
 @enduml
