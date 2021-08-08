@@ -1,0 +1,69 @@
+@startuml
+
+package Domain
+{
+    interface IInventory
+    {
+        Items
+        HasItem()
+        AddItem()
+        RemoveItem()
+    }
+    IInventory --> ItemPile
+    IInventory -->IInventoryItem
+    
+    interface ICategorizedInventory
+    {
+        Categories
+        HasCategory()
+        GetItems()
+    }
+    ICategorizedInventory --|> IInventory
+    
+    interface IWeightedInventory
+    {
+        MaxWeight
+        CurrentWeight
+        OnOverweight <<event>>
+        IncreaseMaxWeight()
+        CanBearItem()
+    }
+    IWeightedInventory --|> IInventory
+    
+    interface IInventoryItemCategory
+    
+    interface IInventoryItem
+    {
+        Category
+        Weight
+    }
+    IInventoryItem --> IInventoryItemCategory
+    
+    class ItemPile <<Data structure>>
+    {   
+        item : IInventoryItem
+        count : int
+    }
+    ItemPile --> IInventoryItem 
+}
+note left of Domain : A ~ 1 \n (I = 0) \n E = 1
+
+package Domain.Details
+{
+    class GeneralistInventory
+    {
+        -itemPiles : List<itemPile>
+    }
+    GeneralistInventory --|> IWeightedInventory
+    GeneralistInventory --|> ICategorizedInventory
+    
+    class LimitedWeightedInventory <<Decorator>>
+    {
+        -decorated : IWeightedInventory
+    }
+    LimitedWeightedInventory --|> IWeightedInventory
+    LimitedWeightedInventory o--  IWeightedInventory 
+}
+note top of Domain.Details : A = 0 \n (I = 1) \n E = 0
+
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+skinparam componentStyle uml1
+
+package "Kalendra.Inventory"{
+    API - [Domain]
+    [Domain.Details] --|> [Domain]
+}
+
+  [Client Domain] #transparent
+  [Client Domain] --> API
+  
+  [Client Main] #transparent
+  [Client Main] ..> API
+  [Client Main] ..> [Domain.Details] : "Dependency Injection"
+@enduml
